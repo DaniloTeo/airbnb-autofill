@@ -1,9 +1,32 @@
 
-// find and click on the disguised dropdown
 
-const getChosenFromDisguisedDropdown = () => {
-    
+const getElementInnerText = (option, levels) => {
+    if (levels == 1){
+        return option.firstElementChild.innerText.toLowerCase()
+    }
+    if(levels == 2){
+        return option.firstElementChild.firstElementChild.innerText.toLowerCase()
+    }
 }
+
+const getChosenFromDisguisedDropdown = (optionParam, levels) => {
+    const optionList = document.querySelectorAll('div[role=option]')
+    for(let i = 0; i < optionList.length; i++){
+        title = getElementInnerText(optionList[i], levels)
+        if(title === optionParam){
+            return optionList[i]
+        }
+    }
+}
+
+const chooseFromDisguisedDropdown = (id, param, level) => {
+    const dropdown = document.getElementById(id)
+    dropdown.click()
+    const chosen = getChosenFromDisguisedDropdown(param.toLowerCase(), level)
+
+    chosen.click()
+}
+
 
 const chooseRoomType = () => {
    
@@ -14,37 +37,32 @@ const chooseRoomType = () => {
     const options = document.querySelectorAll('div[role=option]')
 
     const optionParam = 'Quarto inteiro'.toLowerCase()
-    let chosen;
-
-    for(let i = 0; i < options.length; i++){
-        title = options[i].firstElementChild.firstElementChild.innerText.toLowerCase()
-        if(title === optionParam){
-            chosen = options[i]
-        }
-    }
+    const chosen = getChosenFromDisguisedDropdown(optionParam, options, 2)
     chosen.click()
 }
 
-const choosePropertyType = () => {
-    const id="description-dropdown-property-type-group"
-    const propertyTypeDropDown = document.getElementById(id)
-    propertyTypeDropDown.click()
+const handleRoomPageTopHalf = () => {
+    // property type
+    chooseFromDisguisedDropdown("description-dropdown-property-type-group", 'Apartamento', 2)
     
-    const options = document.querySelectorAll('div[role=option]')
-    const propertyTypeParam =  'Casa'.toLowerCase()
-    let chosen;
-    for(let i = 0; i < options.length; i++){
-        const title = options[i].firstElementChild.firstElementChild.innerText.toLowerCase()
-        if(title === propertyTypeParam){
-            chosen = options[i]
-        }
-    }
-    chosen.click()
-    dividedDropdown = document.getElementById("divided-dropdown-property-type")
-    dividedDropdown.click()
+    // divided property type
+    chooseFromDisguisedDropdown("divided-dropdown-property-type", 'Apartamento', 1)
+    // document.scroll(0,200)
+    // //room type
+    // const roomTypeDropdown = document.getElementById("description-dropdown-room_type")
+    // roomTypeDropdown.click()
+
+    // const roomTypeParam = 'Quarto inteiro'.toLowerCase()
+    // const chosenRoom = getChosenFromDisguisedDropdown(roomTypeParam, 2)
+    // chosenRoom.click()
+}
+const handleRoomPageBottomHalf = () => {
+    
+    chooseFromDisguisedDropdown("description-dropdown-room_type", 'Quarto inteiro', 2)
+    
 }
 
 chrome.runtime.onMessage.addListener((url) => {
     if(url === 'https://www.airbnb.com.br/become-a-host') chooseRoomType()
-    if(url === 'https://www.airbnb.com.br/become-a-host/room') choosePropertyType()
+    if(url === 'https://www.airbnb.com.br/become-a-host/room') handleRoomPageTopHalf();handleRoomPageBottomHalf();
 })
